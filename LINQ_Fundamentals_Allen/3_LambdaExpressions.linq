@@ -46,6 +46,14 @@ void Main()
 	{
 		Console.WriteLine(enumerator.Current.Name);
 	}
+	
+	Console.WriteLine("*****");
+	// LINQ Version with Lambda Expressions
+	foreach(var employee in developers.Where(e => e.Name.Length == 5)
+										.OrderByDescending(e => e.Name))
+	{
+		Console.WriteLine(employee.Name);
+	}
 }
 
 public static bool NameStartsWithS(Employee employee)

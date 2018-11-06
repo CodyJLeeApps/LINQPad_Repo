@@ -54,6 +54,17 @@ void Main()
 	{
 		Console.WriteLine(employee.Name);
 	}
+
+	Console.WriteLine("*****");
+	// LINQ Version with Lambda Expressions in Query Format
+	var query2 = 	from developer in developers
+					where developer.Name.Length == 5
+					orderby developer.Name
+					select developer;
+	foreach (var employee in query2)
+	{
+		Console.WriteLine(employee.Name);
+	}
 }
 
 public static bool NameStartsWithS(Employee employee)

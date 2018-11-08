@@ -2,6 +2,13 @@
 
 void Main()
 {
+	
+	var numbers = MyLinq.Random().Where(nameof => nameof > 0.5).Take(10);
+	foreach(var number in numbers)
+	{
+		Console.WriteLine(number);
+	}
+	
 	var movies = new List<Movie>
 	{
 		new Movie { Title = "The Dark Night Rises", Rating = 8.9f, Year = 2008},
@@ -10,8 +17,12 @@ void Main()
 		new Movie { Title = "Star Wars V",          Rating = 8.7f, Year = 1980}
 	};
 
-	var query = movies.Filter(m => m.Year > 2000)
-						.OrderByDescending(m => m.Rating);
+	/*var query = movies.Filter(m => m.Year > 2000)
+						.OrderByDescending(m => m.Rating);*/
+	var query = from movie in movies
+				where movie.Year > 2000
+				orderby movie.Rating descending
+				select movie;
 
 	Console.WriteLine(query.Count());
 	var enumerator = query.GetEnumerator();
@@ -55,6 +66,15 @@ public static class MyLinq
 			{
 				yield return item;
 			}
+		}
+	}
+	
+	public static IEnumerable<double> Random()
+	{
+		var random = new Random();
+		while(true)
+		{
+			yield return random.NextDouble();
 		}
 	}
 }

@@ -4,10 +4,18 @@ void Main()
 {
 	var cars = ProcessFile(@"C:\Users\cody\Documents\LINQPad Queries\LINQPad_Repo\LINQ_Fundamentals_Allen\fuel.csv");
 	
-	// test car name output
-	foreach (var car in cars)
+	/*
+	var query = cars.OrderByDescending(c => c.Combined)
+					.ThenBy(c => c.Name);
+	*/
+	
+	var query = from car in cars
+				orderby car.Combined descending, car.Name ascending
+				select car;
+	
+	foreach (var car in query.Take(10))
 	{
-		Console.WriteLine(car.Name);
+		Console.WriteLine($"{car.Name} : {car.Combined}");
 	}
 }
 

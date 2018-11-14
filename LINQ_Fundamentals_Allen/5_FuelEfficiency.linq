@@ -10,13 +10,23 @@ void Main()
 	*/
 	
 	var query = from car in cars
+				where car.Manufacturer == "BMW" && car.Year == 2016
 				orderby car.Combined descending, car.Name ascending
 				select car;
+	
+	var query2 = 
+			cars.Where(c => c.Manufacturer == "BMW" && c.Year == 2016)
+				.OrderByDescending(c => c.Combined)
+				.ThenBy(c => c.Name)
+				.First();
 	
 	foreach (var car in query.Take(10))
 	{
 		Console.WriteLine($"{car.Name} : {car.Combined}");
 	}
+
+	Console.WriteLine("**********");
+	Console.WriteLine($"{query2.Name} : {query2.Combined}");
 }
 
 private static List<Car> ProcessFile(string filePath)

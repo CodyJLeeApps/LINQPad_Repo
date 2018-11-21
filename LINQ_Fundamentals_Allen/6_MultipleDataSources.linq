@@ -15,12 +15,29 @@ void Main()
 					car.Name,
 					car.Combined
 				};
-
+	
+	var query2 = cars.Join(manufacturers,
+							c => c.Manufacturer,
+							m => m.Name,
+							(c, m) => new
+							{
+								m.Headquarters,
+								c.Name,
+								c.Combined
+							})
+					.OrderByDescending(c => c.Combined)
+					.ThenBy(c => c.Name);
+	
 	foreach (var car in query.Take(10))
 	{
 		Console.WriteLine($"{car.Headquarters} {car.Name} : {car.Combined}");
 	}
-	Console.WriteLine("**********");
+	Console.WriteLine("\n**********\n");
+
+	foreach (var car in query2.Take(10))
+	{
+		Console.WriteLine($"{car.Headquarters} {car.Name} : {car.Combined}");
+	}
 
 }
 

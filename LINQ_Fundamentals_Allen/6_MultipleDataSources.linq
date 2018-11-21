@@ -4,38 +4,24 @@ void Main()
 {
 	var cars = ProcessCarsFile(@"C:\Users\cody\Documents\LINQPad Queries\LINQPad_Repo\LINQ_Fundamentals_Allen\fuel.csv");
 	var manufacturers = ProcessManufacturersFile(@"C:\Users\cody\Documents\LINQPad Queries\LINQPad_Repo\LINQ_Fundamentals_Allen\manufacturers.csv");
-	/*
-	var query = cars.OrderByDescending(c => c.Combined)
-					.ThenBy(c => c.Name);
-	*/
-	
+
 	var query = from car in cars
-				where car.Manufacturer == "BMW" && car.Year == 2016
+				join manufacturer in manufacturers
+					on car.Manufacturer equals manufacturer.Name
 				orderby car.Combined descending, car.Name ascending
 				select new
 				{
-					Manufacturer = car.Manufacturer,
+					manufacturer.Headquarters,
 					car.Name,
 					car.Combined
 				};
-	
-	var query2 = 
-			cars.Where(c => c.Manufacturer == "BMW" && c.Year == 2016)
-				.OrderByDescending(c => c.Combined)
-				.ThenBy(c => c.Name)
-				.First();
 
-	var result = cars.Any(c => c.Manufacturer == "Ford");
-	Console.WriteLine($"{result}");
-	
 	foreach (var car in query.Take(10))
 	{
-		Console.WriteLine($"{car.Manufacturer} {car.Name} : {car.Combined}");
+		Console.WriteLine($"{car.Headquarters} {car.Name} : {car.Combined}");
 	}
-
 	Console.WriteLine("**********");
-	Console.WriteLine($"{query2.Name} : {query2.Combined}");
-	
+
 }
 
 private static List<Manufacturer> ProcessManufacturersFile(string filePath)
@@ -61,7 +47,7 @@ private static List<Car> ProcessCarsFile(string filePath)
 						.Skip(1)
 						.Where(line => line.Length > 1)
 						.ToCar();
-	
+
 	return fileQuery.ToList();
 }
 
@@ -69,7 +55,7 @@ public static class CarExtensions
 {
 	public static IEnumerable<Car> ToCar(this IEnumerable<string> source)
 	{
-		foreach(var line in source)
+		foreach (var line in source)
 		{
 			var columns = line.Split(',');
 			yield return new Car

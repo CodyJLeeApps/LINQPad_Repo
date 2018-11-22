@@ -5,50 +5,82 @@ void Main()
 	var cars = ProcessCarsFile(@"C:\Users\cody\Documents\LINQPad Queries\LINQPad_Repo\LINQ_Fundamentals_Allen\fuel.csv");
 	var manufacturers = ProcessManufacturersFile(@"C:\Users\cody\Documents\LINQPad Queries\LINQPad_Repo\LINQ_Fundamentals_Allen\manufacturers.csv");
 
-	var query = from manufacturer in manufacturers
-				join car in cars on manufacturer.Name equals car.Manufacturer
-					into carGroup
-				orderby manufacturer.Name
+	var query = from car in cars
+				group car by car.Manufacturer into carGroup
 				select new
 				{
-					Manufacturer = manufacturer,
-					Cars = carGroup
+					Name = carGroup.Key,
+					Max = carGroup.Max(c => c.Combined),
+					Min = carGroup.Min(c => c.Combined),
+					Avg = carGroup.Average(c => c.Combined)
 				} into result
-				group result by result.Manufacturer.Headquarters;
+				orderby result.Max descending
+				select result;
 
 
-	foreach (var group in query)
+	foreach (var result in query)
 	{
-		Console.WriteLine($"{group.Key}");
-		foreach(var car in group.SelectMany(g => g.Cars)
-								.OrderByDescending(c => c.Combined)
-								.Take(3))
-		{
-			Console.WriteLine($"\t\t\t{car.Manufacturer} - {car.Name} : {car.Combined}");
-		}
+		Console.WriteLine($"{result.Name}");
+		Console.WriteLine($"\t\t\t Max: {result.Max}");
+		Console.WriteLine($"\t\t\t Average: {result.Avg}");
+		Console.WriteLine($"\t\t\t Min: {result.Min}");
 	}
 
-	var query2 = manufacturers.GroupJoin(cars, 
-										m => m.Name, 
-										c => c.Manufacturer, 
-										(m, g) => 
-											new 
-											{ 
-												Manufacturer = m,
-												Cars = g
-											})
-								.GroupBy(m => m.Manufacturer.Headquarters);
-
-	Console.WriteLine("\n**********\n");
-	foreach (var group in query2)
+	var query2 = cars.GroupBy(c => c.Manufacturer)
+					.Select(g =>
+					{
+						var results = g.Aggregate(new CarStatistics(),
+												(acc, c) => acc.Accumulate(c),
+												acc => acc.Compute());
+						return new
+						{
+							Name = g.Key,
+							Max = results.Max,
+							Avg = results.Average,
+							Min = results.Min
+						};
+					})
+					.OrderByDescending(r => r.Max);
+	
+	Console.WriteLine("\n\n*********\n\n");
+	foreach (var result in query2)
 	{
-		Console.WriteLine($"{group.Key}");
-		foreach (var car in group.SelectMany(g => g.Cars)
-								.OrderByDescending(c => c.Combined)
-								.Take(3))
-		{
-			Console.WriteLine($"\t\t\t{car.Manufacturer} - {car.Name} : {car.Combined}");
-		}
+		Console.WriteLine($"{result.Name}");
+		Console.WriteLine($"\t\t\t Max: {result.Max}");
+		Console.WriteLine($"\t\t\t Average: {result.Avg}");
+		Console.WriteLine($"\t\t\t Min: {result.Min}");
+	}
+}
+
+public class CarStatistics
+{
+	public int Max { get; set; }
+	public int Min { get; set; }
+	public int Total { get; set; }
+	public int Count { get; set; }
+	public int Average { get; set; }
+
+	public CarStatistics()
+	{
+		
+		Max = Int32.MinValue;
+		Min = Int32.MaxValue;
+		
+	}
+
+	public CarStatistics Accumulate(Car car)
+	{
+		Count += 1;
+		Total += car.Combined;
+		Max = Math.Max(Max, car.Combined);
+		Min = Math.Min(Min, car.Combined);
+		return this;
+	}
+
+	public CarStatistics Compute()
+	{
+		Average = Total / Count;
+		return this;
 	}
 }
 

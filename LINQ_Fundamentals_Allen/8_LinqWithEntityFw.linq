@@ -1,4 +1,7 @@
-<Query Kind="Program" />
+<Query Kind="Program">
+  <NuGetReference Version="6.1.3">EntityFramework</NuGetReference>
+  <Namespace>System.Data.Entity</Namespace>
+</Query>
 
 void Main()
 {
@@ -136,6 +139,7 @@ public class Manufacturer
 
 public class Car
 {
+	public int Id { get; set; }
 	public int Year { get; set; }
 	public string Manufacturer { get; set; }
 	public string Name { get; set; }
@@ -144,4 +148,9 @@ public class Car
 	public int City { get; set; }
 	public int Highway { get; set; }
 	public int Combined { get; set; }
+}
+
+public class CarDB : DbContext
+{
+	public DbSet<Car> Cars { get; set; }
 }

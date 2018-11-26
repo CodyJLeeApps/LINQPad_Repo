@@ -2,23 +2,26 @@
 
 void Main()
 {
-	var records = ProcessCarsFile(@"C:\Users\cody\Documents\LINQPad Queries\LINQPad_Repo\LINQ_Fundamentals_Allen\fuel.csv");
+	CreateXml();
 	
+	
+}
+
+private static void CreateXml()
+{
+	var records = ProcessCarsFile(@"C:\Users\cody\Documents\LINQPad Queries\LINQPad_Repo\LINQ_Fundamentals_Allen\fuel.csv");
+
 	var document = new XDocument();
 	var cars = new XElement("Cars");
-	
-	foreach( var record in records)
-	{
-		var car = new XElement("Car");
-		var name = new XElement("Name", record.Name);
-		var combined = new XElement("Combined", record.Combined);
-		
-		car.Add(name);
-		car.Add(combined);
-		
-		cars.Add(car);
-	}
-	
+
+	var elements = from record in records
+				   select new XElement("Car",
+							   new XAttribute("Name", record.Name),
+							   new XAttribute("Combined", record.Combined),
+							   new XAttribute("Manufacturer", record.Manufacturer));
+
+	cars.Add(elements);
+
 	document.Add(cars);
 	document.Save(@"C:\users\cody\Documents\LINQPad Queries\LINQPad_Repo\LINQ_Fundamentals_Allen\fuel.xml");
 }
